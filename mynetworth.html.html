@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyWorthNow - Modern Net Worth Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #00C896;
+            --primary-dark: #16C47F;
+            --dark-bg: #121826;
+            --dark-card: #1E293B;
+            --dark-text: #E2E8F0;
+            --light-bg: #F8FAFC;
+            --light-card: #FFFFFF;
+            --light-text: #334155;
+            --border-radius: 12px;
+            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: var(--light-bg);
+            color: var(--light-text);
+            transition: var(--transition);
+        }
+
+        body.dark-mode {
+            background-color: var(--dark-bg);
+            color: var(--dark-text);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header Styles */
+        header {
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            background-color: var(--light-card);
+            transition: var(--transition);
+        }
+
+        body.dark-mode header {
+            background-color: var(--dark-card);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: inherit;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        nav a:hover {
+            color: var(--primary);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            color: inherit;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 60px 0 40px;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 18px;
+            max-width: 600px;
+            margin: 0 auto 30px;
+            line-height: 1.6;
+        }
+
+        .cta-button {
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 20px -5px rgba(0, 200, 150, 0.3);
+        }
+
+        /* Calculator Layout */
+        .calculator-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 40px 0;
+        }
+
+        @media (max-width: 900px) {
+            .calculator-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Input Section */
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .input-card {
+            background-color: var(--light-card);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        body.dark-mode .input-card {
+            background-color: var(--dark-card);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+
+        .card-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .toggle-icon {
+            transition: var(--transition);
+        }
+
+        .card-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .card-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .input-group input {
+            padding: 12px 15px;
+            border: 1px solid #CBD5E1;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: var(--transition);
+            background-color: var(--light-card);
+            color: var(--light-text);
+        }
+
+        body.dark-mode .input-group input {
+            background-color: var(--dark-card);
+            border-color: #475569;
+            color: var(--dark-text);
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 200, 150, 0.2);
+        }
+
+        /* Results Section */
+        .results-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .summary-card {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            text-align: center;
+        }
+
+        .summary-card h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        .summary-values {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .summary-values {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .summary-value {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .summary-value .label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .summary-value .value {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .net-worth {
+            font-size: 36px;
+            font-weight: 800;
+            margin: 10px 0;
+        }
+
+        .positive {
+            color: #10B981;
+        }
+
+        .negative {
+            color: #EF4444;
+        }
+
+        .charts-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .chart-card {
+            background-color: var(--light-card);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        body.dark-mode .chart-card {
+            background-color: var(--dark-card);
+        }
+
+        .chart-card h3 {
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+        }
+
+        .insights-card {
+            background-color: var(--light-card);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        body.dark-mode .insights-card {
+            background-color: var(--dark-card);
+        }
+
+        .insights-card h3 {
+            margin-bottom: 20px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .insight-item {
+            padding: 15px;
+            background-color: rgba(0, 200, 150, 0.1);
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .projection-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .projection-controls input {
+            flex: 1;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .action-button {
+            flex: 1;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+        }
+
+        .primary-btn {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .secondary-btn {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        body.dark-mode .secondary-btn {
+            color: var(--dark-text);
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        /* Footer */
+        footer {
+            padding: 40px 0;
+            margin-top: 60px;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            background-color: var(--light-card);
+            transition: var(--transition);
+        }
+
+        body.dark-mode footer {
+            background-color: var(--dark-card);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-links a {
+            text-decoration: none;
+            color: inherit;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-links a {
+            color: inherit;
+            font-size: 20px;
+            transition: var(--transition);
+        }
+
+        .social-links a:hover {
+            color: var(--primary);
+        }
+
+        .copyright {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 14px;
+            opacity: 0.7;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            nav ul {
+                gap: 15px;
+            }
+            
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <span>💎</span> MyWorthNow
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">Calculator</a></li>
+                        <li><a href="#">Tips</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </nav>
+                <button class="theme-toggle" id="themeToggle">🌙</button>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container">
+            <h1>Calculate Your True Net Worth</h1>
+            <p>MyWorthNow helps you understand your complete financial picture by including all your assets, income streams, and liabilities in one modern calculator.</p>
+            <button class="cta-button" id="startCalculation">Start Free Calculation</button>
+        </div>
+    </section>
+
+    <main class="container">
+        <div class="calculator-container">
+            <div class="input-section">
+                <div class="input-card">
+                    <div class="card-header" onclick="toggleCard(this)">
+                        <h3>🏍️ Physical Assets</h3>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="input-group">
+                            <label for="bikeValue">Bike Value (₹)</label>
+                            <input type="number" id="bikeValue" placeholder="0">
+                        </div>
+                        <div class="input-group">
+                            <label for="carValue">Car Value (₹)</label>
+                            <input type="number" id="carValue" placeholder="0">
+                        </div>
+                        <div class="input-group">
+                            <label for="homeValue">Home Market Value (₹)</label>
+                            <input type="number" id="homeValue" placeholder="0">
+                        </div>
+                        <div class="input-group">
+                            <label for="electronicsValue">Electronics & Gadgets (₹)</label>
+                            <input type="number" id="electronicsValue" placeholder="0">
+                        </div>
+                        <div class="input-group">
+                            <label for="jewelryValue">Jewellery & Gold (₹)</label>
+                            <input type="number" id="jewelryValue" placeholder="0">
+                        </div>
+                        <div class="input-group">
+                            <label for="otherPhysicalAssets">Other Physical Assets (₹)</label>
+                            <input type="number" id="otherPhysicalAssets" placeholder="0">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-card">
+                    <div class="card-header" onclick="toggleCard(this)">
+                        <h3>💰 Financial Assets</h3>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="input-group">
+                            <label for="bankBalance">Bank Balance (₹)</label>
+                            <input type="number" id="bankBalance" placeholder="0">
+                        </div>
+                        <div class="input-group">
+                            <label for="fixedDeposits">Fixed Deposits (₹)</label>
+                            <input type="number" id="fixedDeposits" placeholder="0">
+                        </div>
+                        <div class="input-group">
+                            <label for="stocks">Stocks / Mutual Funds (₹)</label>
+                            <input type="number" id="stocks" placeholder="0">
+                        </div>
+                        <div class="input-group">
+                            <label for="epf">EPF / PPF / NPS (₹)</label>
+                            <input type="number" id="epf" placeholder="0">
+                        </div>
+                        <div class="input-group">
+                            <label for="crypto">Crypto / Digital Assets (₹)</label>
+                            <input type="number" id="crypto" placeholder="0">
+                        </div>
+                        <div class="input-group">
+                            <label for="otherInvestments">Other Investments (₹)</label>
+                            <input type="number" id="otherInvestments" placeholder="0">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-card">
+                    <div class="card-header" onclick="toggleCard(this)">
+                        <h3>💸 Income Streams</h3>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="input-group">
+                            <label for="monthlySalary">Monthly Salary (₹)</label>
+                            <input type="number" id="monthlySalary" placeholder="0">
+                        </div>
+                        <div class="input-group">
+                            <label for="rentalIncome">Rental Income (₹)</label>
+                            <input type="number" id="rentalIncome" placeholder="0">
+                        </div>
+                        <div class="input-group">
+                            <label for="sideIncome">Side Business / Freelance Income (₹)</label>
+                            <input type="number" id="sideIncome" placeholder="0">
+                        </div>
+                        <div class="input-group">
+                            <label for="otherIncome">Other Income (₹)</label>
+                            <input type="number" id="otherIncome" placeholder="0">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-card">
+                    <div class="card-header" onclick="toggleCard(this)">
+                        <h3>📉 Loans & Liabilities</h3>
+                        <span class="toggle-icon">▼</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="input-group">
+                            <label for="homeLoan">Home Loan Balance (₹)</label>
+                            <input type="number" id="homeLoan" placeholder="0">
+                        </div>
+                        <div class="input-group">
+                            <label for="vehicleLoan">Car / Bike Loan Balance (₹)</label>
+                            <input type="number" id="vehicleLoan" placeholder="0">
+                        </div>
+                        <div class="input-group">
+                            <label for="personalLoan">Personal Loan (₹)</label>
+                            <input type="number" id="personalLoan" placeholder="0">
+                        </div>
+                        <div class="input-group">
+                            <label for="creditCard">Credit Card Dues (₹)</label>
+                            <input type="number" id="creditCard" placeholder="0">
+                        </div>
+                        <div class="input-group">
+                            <label for="educationLoan">Education Loan (₹)</label>
+                            <input type="number" id="educationLoan" placeholder="0">
+                        </div>
+                        <div class="input-group">
+                            <label for="otherLiabilities">Other Liabilities (₹)</label>
+                            <input type="number" id="otherLiabilities" placeholder="0">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-card">
+                    <div class="card-header">
+                        <h3>📈 Projection Settings</h3>
+                    </div>
+                    <div class="card-content">
+                        <div class="input-group">
+                            <label for="assetGrowth">Expected Annual Asset Growth (%)</label>
+                            <input type="number" id="assetGrowth" value="7" min="0" max="30" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label for="loanRepayment">Expected Loan Repayment Rate (%)</label>
+                            <input type="number" id="loanRepayment" value="10" min="0" max="100" step="1">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="action-button primary-btn" id="calculateBtn">Calculate Net Worth</button>
+                    <button class="action-button secondary-btn" id="resetBtn">Reset All</button>
+                </div>
+            </div>
+
+            <div class="results-section">
+                <div class="summary-card">
+                    <h2>Your Net Worth Summary</h2>
+                    <div class="summary-values">
+                        <div class="summary-value">
+                            <div class="label">Total Assets</div>
+                            <div class="value" id="totalAssets">₹0</div>
+                        </div>
+                        <div class="summary-value">
+                            <div class="label">Total Liabilities</div>
+                            <div class="value" id="totalLiabilities">₹0</div>
+                        </div>
+                        <div class="summary-value">
+                            <div class="label">Annual Income</div>
+                            <div class="value" id="annualIncome">₹0</div>
+                        </div>
+                    </div>
+                    <div class="net-worth" id="netWorth">₹0</div>
+                    <div id="netWorthStatus">Enter your financial details to calculate</div>
+                </div>
+
+                <div class="chart-card">
+                    <h3>Assets vs Liabilities</h3>
+                    <div class="chart-container">
+                        <canvas id="assetsLiabilitiesChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <h3>Net Worth Projection</h3>
+                    <div class="projection-controls">
+                        <div class="input-group">
+                            <label for="projectionYears">Projection Years</label>
+                            <input type="number" id="projectionYears" value="10" min="1" max="30">
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="projectionChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="insights-card">
+                    <h3>Financial Insights</h3>
+                    <div id="insightsContainer">
+                        <div class="insight-item">
+                            Enter your financial details to get personalized insights.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="action-button primary-btn" id="downloadReport">Download Report PDF</button>
+                    <button class="action-button secondary-btn" id="recalculateBtn">Recalculate</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="logo">
+                    <span>💎</span> MyWorthNow
+                </div>
+                <div class="footer-links">
+                    <a href="#">Privacy</a>
+                    <a href="#">Terms</a>
+                    <a href="#">Support</a>
+                    <a href="#">Contact</a>
+                </div>
+                <div class="social-links">
+                    <a href="#">📘</a>
+                    <a href="#">🐦</a>
+                    <a href="#">📷</a>
+                    <a href="#">💼</a>
+                </div>
+            </div>
+            <div class="copyright">
+                © 2025 MyWorthNow | All rights reserved
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // DOM Elements
+        const themeToggle = document.getElementById('themeToggle');
+        const calculateBtn = document.getElementById('calculateBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const downloadReport = document.getElementById('downloadReport');
+        const recalculateBtn = document.getElementById('recalculateBtn');
+        const startCalculation = document.getElementById('startCalculation');
+        const projectionYearsInput = document.getElementById('projectionYears');
+        
+        // Input Elements
+        const inputElements = document.querySelectorAll('input[type="number"]');
+        
+        // Result Elements
+        const totalAssetsEl = document.getElementById('totalAssets');
+        const totalLiabilitiesEl = document.getElementById('totalLiabilities');
+        const annualIncomeEl = document.getElementById('annualIncome');
+        const netWorthEl = document.getElementById('netWorth');
+        const netWorthStatusEl = document.getElementById('netWorthStatus');
+        const insightsContainer = document.getElementById('insightsContainer');
+        
+        // Charts
+        let assetsLiabilitiesChart = null;
+        let projectionChart = null;
+        
+        // Theme Toggle
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            themeToggle.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+            
+            // Update charts if they exist
+            if (assetsLiabilitiesChart) {
+                assetsLiabilitiesChart.destroy();
+                createAssetsLiabilitiesChart();
+            }
+            
+            if (projectionChart) {
+                projectionChart.destroy();
+                createProjectionChart();
+            }
+        });
+        
+        // Toggle Card Content
+        function toggleCard(header) {
+            const content = header.nextElementSibling;
+            const icon = header.querySelector('.toggle-icon');
+            
+            if (content.style.display === 'none') {
+                content.style.display = 'grid';
+                icon.textContent = '▼';
+            } else {
+                content.style.display = 'none';
+                icon.textContent = '▶';
+            }
+        }
+        
+        // Initialize all cards as expanded
+        document.querySelectorAll('.card-content').forEach(content => {
+            content.style.display = 'grid';
+        });
+        
+        // Calculate Net Worth
+        function calculateNetWorth() {
+            // Get physical assets
+            const bikeValue = parseFloat(document.getElementById('bikeValue').value) || 0;
+            const carValue = parseFloat(document.getElementById('carValue').value) || 0;
+            const homeValue = parseFloat(document.getElementById('homeValue').value) || 0;
+            const electronicsValue = parseFloat(document.getElementById('electronicsValue').value) || 0;
+            const jewelryValue = parseFloat(document.getElementById('jewelryValue').value) || 0;
+            const otherPhysicalAssets = parseFloat(document.getElementById('otherPhysicalAssets').value) || 0;
+            
+            // Get financial assets
+            const bankBalance = parseFloat(document.getElementById('bankBalance').value) || 0;
+            const fixedDeposits = parseFloat(document.getElementById('fixedDeposits').value) || 0;
+            const stocks = parseFloat(document.getElementById('stocks').value) || 0;
+            const epf = parseFloat(document.getElementById('epf').value) || 0;
+            const crypto = parseFloat(document.getElementById('crypto').value) || 0;
+            const otherInvestments = parseFloat(document.getElementById('otherInvestments').value) || 0;
+            
+            // Get income streams (convert monthly to annual)
+            const monthlySalary = parseFloat(document.getElementById('monthlySalary').value) || 0;
+            const rentalIncome = parseFloat(document.getElementById('rentalIncome').value) || 0;
+            const sideIncome = parseFloat(document.getElementById('sideIncome').value) || 0;
+            const otherIncome = parseFloat(document.getElementById('otherIncome').value) || 0;
+            
+            // Get liabilities
+            const homeLoan = parseFloat(document.getElementById('homeLoan').value) || 0;
+            const vehicleLoan = parseFloat(document.getElementById('vehicleLoan').value) || 0;
+            const personalLoan = parseFloat(document.getElementById('personalLoan').value) || 0;
+            const creditCard = parseFloat(document.getElementById('creditCard').value) || 0;
+            const educationLoan = parseFloat(document.getElementById('educationLoan').value) || 0;
+            const otherLiabilities = parseFloat(document.getElementById('otherLiabilities').value) || 0;
+            
+            // Calculate totals
+            const physicalAssets = bikeValue + carValue + homeValue + electronicsValue + jewelryValue + otherPhysicalAssets;
+            const financialAssets = bankBalance + fixedDeposits + stocks + epf + crypto + otherInvestments;
+            const annualIncome = (monthlySalary + rentalIncome + sideIncome + otherIncome) * 12;
+            const totalAssets = physicalAssets + financialAssets;
+            const totalLiabilities = homeLoan + vehicleLoan + personalLoan + creditCard + educationLoan + otherLiabilities;
+            const netWorth = totalAssets - totalLiabilities;
+            
+            // Update UI
+            totalAssetsEl.textContent = `₹${formatNumber(totalAssets)}`;
+            totalLiabilitiesEl.textContent = `₹${formatNumber(totalLiabilities)}`;
+            annualIncomeEl.textContent = `₹${formatNumber(annualIncome)}`;
+            netWorthEl.textContent = `₹${formatNumber(netWorth)}`;
+            
+            // Set net worth status
+            if (netWorth > 0) {
+                netWorthEl.className = 'net-worth positive';
+                netWorthStatusEl.textContent = 'Great! You have a positive net worth.';
+            } else if (netWorth < 0) {
+                netWorthEl.className = 'net-worth negative';
+                netWorthStatusEl.textContent = 'Your liabilities exceed your assets. Consider reducing debt.';
+            } else {
+                netWorthEl.className = 'net-worth';
+                netWorthStatusEl.textContent = 'Your assets and liabilities are balanced.';
+            }
+            
+            // Create charts
+            createAssetsLiabilitiesChart(physicalAssets, financialAssets, totalLiabilities);
+            createProjectionChart(netWorth);
+            
+            // Generate insights
+            generateInsights(
+                physicalAssets, financialAssets, annualIncome, totalLiabilities, netWorth,
+                bikeValue, carValue, homeValue, rentalIncome, homeLoan
+            );
+        }
+        
+        // Format numbers with commas
+        function formatNumber(num) {
+            return num.toLocaleString('en-IN', {
+                maximumFractionDigits: 0
+            });
+        }
+        
+        // Create Assets vs Liabilities Chart
+        function createAssetsLiabilitiesChart(physicalAssets = 0, financialAssets = 0, totalLiabilities = 0) {
+            const ctx = document.getElementById('assetsLiabilitiesChart').getContext('2d');
+            
+            if (assetsLiabilitiesChart) {
+                assetsLiabilitiesChart.destroy();
+            }
+            
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            const textColor = isDarkMode ? '#E2E8F0' : '#334155';
+            const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+            
+            assetsLiabilitiesChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Physical Assets', 'Financial Assets', 'Liabilities'],
+                    datasets: [{
+                        data: [physicalAssets, financialAssets, totalLiabilities],
+                        backgroundColor: [
+                            '#00C896',
+                            '#16C47F',
+                            '#EF4444'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: textColor,
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                                    return `${label}: ₹${formatNumber(value)} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Create Projection Chart
+        function createProjectionChart(currentNetWorth = 0) {
+            const ctx = document.getElementById('projectionChart').getContext('2d');
+            const projectionYears = parseInt(document.getElementById('projectionYears').value) || 10;
+            const assetGrowth = parseFloat(document.getElementById('assetGrowth').value) || 7;
+            const loanRepayment = parseFloat(document.getElementById('loanRepayment').value) || 10;
+            
+            if (projectionChart) {
+                projectionChart.destroy();
+            }
+            
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            const textColor = isDarkMode ? '#E2E8F0' : '#334155';
+            const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+            
+            // Generate projection data
+            const years = [];
+            const projectedValues = [];
+            
+            for (let i = 0; i <= projectionYears; i++) {
+                years.push(`Year ${i}`);
+                // Simplified projection: assets grow, liabilities decrease
+                const assetGrowthFactor = Math.pow(1 + assetGrowth/100, i);
+                const liabilityReductionFactor = Math.max(0, 1 - (loanRepayment/100) * i);
+                
+                const totalAssets = parseFloat(totalAssetsEl.textContent.replace(/[^0-9.-]+/g,"")) || 0;
+                const totalLiabilities = parseFloat(totalLiabilitiesEl.textContent.replace(/[^0-9.-]+/g,"")) || 0;
+                
+                const projectedAssets = totalAssets * assetGrowthFactor;
+                const projectedLiabilities = totalLiabilities * liabilityReductionFactor;
+                const projectedNetWorth = projectedAssets - projectedLiabilities;
+                
+                projectedValues.push(projectedNetWorth);
+            }
+            
+            projectionChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: years,
+                    datasets: [{
+                        label: 'Projected Net Worth',
+                        data: projectedValues,
+                        borderColor: '#00C896',
+                        backgroundColor: 'rgba(0, 200, 150, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: textColor
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Net Worth: ₹${formatNumber(context.raw)}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: gridColor
+                            },
+                            ticks: {
+                                color: textColor
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: gridColor
+                            },
+                            ticks: {
+                                color: textColor,
+                                callback: function(value) {
+                                    return '₹' + formatNumber(value);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Generate Financial Insights
+        function generateInsights(physicalAssets, financialAssets, annualIncome, totalLiabilities, netWorth, bikeValue, carValue, homeValue, rentalIncome, homeLoan) {
+            insightsContainer.innerHTML = '';
+            
+            if (physicalAssets + financialAssets + annualIncome === 0) {
+                insightsContainer.innerHTML = '<div class="insight-item">Enter your financial details to get personalized insights.</div>';
+                return;
+            }
+            
+            const totalAssets = physicalAssets + financialAssets;
+            
+            // Insight 1: Net worth status
+            if (netWorth > 0) {
+                insightsContainer.innerHTML += `
+                    <div class="insight-item">
+                        <strong>Positive Net Worth:</strong> Your assets exceed your liabilities by ₹${formatNumber(netWorth)}. 
+                        This is a healthy financial position.
+                    </div>
+                `;
+            } else if (netWorth < 0) {
+                insightsContainer.innerHTML += `
+                    <div class="insight-item">
+                        <strong>Negative Net Worth:</strong> Your liabilities exceed your assets by ₹${formatNumber(Math.abs(netWorth))}. 
+                        Consider focusing on debt reduction strategies.
+                    </div>
+                `;
+            }
+            
+            // Insight 2: Asset composition
+            const physicalPercentage = totalAssets > 0 ? Math.round((physicalAssets / totalAssets) * 100) : 0;
+            const financialPercentage = totalAssets > 0 ? Math.round((financialAssets / totalAssets) * 100) : 0;
+            
+            insightsContainer.innerHTML += `
+                <div class="insight-item">
+                    <strong>Asset Composition:</strong> Your assets consist of ${physicalPercentage}% physical assets and 
+                    ${financialPercentage}% financial assets.
+                </div>
+            `;
+            
+            // Insight 3: Debt-to-asset ratio
+            const debtRatio = totalAssets > 0 ? Math.round((totalLiabilities / totalAssets) * 100) : 0;
+            
+            if (debtRatio < 30) {
+                insightsContainer.innerHTML += `
+                    <div class="insight-item">
+                        <strong>Healthy Debt Level:</strong> Your debt-to-asset ratio is ${debtRatio}%, which is considered healthy.
+                    </div>
+                `;
+            } else if (debtRatio > 60) {
+                insightsContainer.innerHTML += `
+                    <div class="insight-item">
+                        <strong>High Debt Level:</strong> Your debt-to-asset ratio is ${debtRatio}%, which is high. Consider paying down debt.
+                    </div>
+                `;
+            } else {
+                insightsContainer.innerHTML += `
+                    <div class="insight-item">
+                        <strong>Moderate Debt Level:</strong> Your debt-to-asset ratio is ${debtRatio}%, which is moderate.
+                    </div>
+                `;
+            }
+            
+            // Insight 4: Home equity
+            if (homeValue > 0 && homeLoan > 0) {
+                const homeEquity = homeValue - homeLoan;
+                const homeEquityPercentage = homeValue > 0 ? Math.round((homeEquity / homeValue) * 100) : 0;
+                
+                if (homeEquityPercentage < 20) {
+                    insightsContainer.innerHTML += `
+                        <div class="insight-item">
+                            <strong>Low Home Equity:</strong> You have ${homeEquityPercentage}% equity in your home. Consider building more equity.
+                        </div>
+                    `;
+                } else if (homeEquityPercentage > 50) {
+                    insightsContainer.innerHTML += `
+                        <div class="insight-item">
+                            <strong>Strong Home Equity:</strong> You have ${homeEquityPercentage}% equity in your home, which is excellent.
+                        </div>
+                    `;
+                }
+            }
+            
+            // Insight 5: Income to debt ratio
+            const incomeToDebtRatio = annualIncome > 0 ? Math.round((totalLiabilities / annualIncome) * 100) : 0;
+            
+            if (incomeToDebtRatio > 300) {
+                insightsContainer.innerHTML += `
+                    <div class="insight-item">
+                        <strong>High Debt Burden:</strong> Your total debt is ${incomeToDebtRatio}% of your annual income. This is a high burden.
+                    </div>
+                `;
+            }
+            
+            // Insight 6: Emergency fund
+            const bankBalance = parseFloat(document.getElementById('bankBalance').value) || 0;
+            const monthlyExpenses = annualIncome / 12 * 0.6; // Assuming 60% of income goes to expenses
+            
+            if (bankBalance < monthlyExpenses * 3) {
+                insightsContainer.innerHTML += `
+                    <div class="insight-item">
+                        <strong>Emergency Fund:</strong> Consider building an emergency fund that covers 3-6 months of expenses.
+                    </div>
+                `;
+            }
+        }
+        
+        // Reset all inputs
+        function resetAll() {
+            inputElements.forEach(input => {
+                input.value = input.id === 'assetGrowth' ? '7' : 
+                             input.id === 'loanRepayment' ? '10' : 
+                             input.id === 'projectionYears' ? '10' : '';
+            });
+            
+            // Reset results
+            totalAssetsEl.textContent = '₹0';
+            totalLiabilitiesEl.textContent = '₹0';
+            annualIncomeEl.textContent = '₹0';
+            netWorthEl.textContent = '₹0';
+            netWorthEl.className = 'net-worth';
+            netWorthStatusEl.textContent = 'Enter your financial details to calculate';
+            
+            // Reset insights
+            insightsContainer.innerHTML = '<div class="insight-item">Enter your financial details to get personalized insights.</div>';
+            
+            // Reset charts
+            if (assetsLiabilitiesChart) {
+                assetsLiabilitiesChart.destroy();
+                createAssetsLiabilitiesChart();
+            }
+            
+            if (projectionChart) {
+                projectionChart.destroy();
+                createProjectionChart();
+            }
+        }
+        
+        // Initialize charts with empty data
+        createAssetsLiabilitiesChart();
+        createProjectionChart();
+        
+        // Event Listeners
+        calculateBtn.addEventListener('click', calculateNetWorth);
+        resetBtn.addEventListener('click', resetAll);
+        recalculateBtn.addEventListener('click', calculateNetWorth);
+        startCalculation.addEventListener('click', () => {
+            document.querySelector('.input-section').scrollIntoView({ behavior: 'smooth' });
+        });
+        
+        projectionYearsInput.addEventListener('change', () => {
+            if (projectionChart) {
+                projectionChart.destroy();
+                createProjectionChart();
+            }
+        });
+        
+        // Download Report (basic implementation)
+        downloadReport.addEventListener('click', () => {
+            alert('PDF report generation would be implemented here. For now, you can take a screenshot of your results.');
+        });
+    </script>
+</body>
+</html>
